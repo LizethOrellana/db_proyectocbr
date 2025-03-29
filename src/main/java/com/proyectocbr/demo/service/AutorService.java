@@ -1,6 +1,7 @@
 package com.proyectocbr.demo.service;
 
 import com.proyectocbr.demo.models.Autor;
+import com.proyectocbr.demo.models.Carrera;
 import com.proyectocbr.demo.repository.AutorRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,4 +39,10 @@ public class AutorService {
     public void deleteAutor(Long id) {
         autorRepository.deleteById(id);
     }
+
+    //Buscar autor
+    public List<Autor> searchAutor(String nombre) {
+        return autorRepository.findByNombreContaining(nombre);
+    }
+
 }

@@ -29,6 +29,11 @@ public class CarreraService {
         return carreraRepository.save(carrera);
     }
 
+    //Buscar carrera
+    public List<Carrera> searchCarrera(String nombre) {
+        return carreraRepository.findByNombreContaining(nombre);
+    }
+
     // Eliminar carrera
     public void deleteCarrera(Long id) {
         carreraRepository.deleteById(id);

@@ -28,7 +28,7 @@ public class DocumentoController {
     }
 
     // Crear o actualizar documento
-    @PostMapping
+    @PostMapping("/crear")
     public Documento createDocumento(@RequestBody Documento documento) {
         return documentoService.saveDocumento(documento);
     }
