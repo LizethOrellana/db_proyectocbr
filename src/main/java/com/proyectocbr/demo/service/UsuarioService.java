@@ -2,12 +2,14 @@ package com.proyectocbr.demo.service;
 
 import com.proyectocbr.demo.models.Usuario;
 import com.proyectocbr.demo.repository.UsuarioRepository;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UsuarioService {
@@ -31,5 +33,15 @@ public class UsuarioService {
         //logger.info("201 Created: Usuario registrado correctamente");
 
         return usuarioRepository.save(usuario);
+    }
+
+    public Usuario obtenerUsuarioPorCedula(String cedula) {
+        Optional<Usuario> usuarioOptional = usuarioRepository.findByCedula(cedula);
+        return usuarioOptional.orElse(null); // Devuelve el usuario si existe, o null si no existe
+    }
+
+    @Transactional
+    public void eliminarUsuario(String cedula) {
+        usuarioRepository.deleteByCedula(cedula);
     }
 }

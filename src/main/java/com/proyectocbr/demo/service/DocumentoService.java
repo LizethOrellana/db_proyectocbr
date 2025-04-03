@@ -1,5 +1,7 @@
 package com.proyectocbr.demo.service;
 
+import com.proyectocbr.demo.models.Autor;
+import com.proyectocbr.demo.models.Carrera;
 import com.proyectocbr.demo.models.Documento;
 import com.proyectocbr.demo.repository.DocumentoRepository;
 import jakarta.transaction.Transactional;
@@ -24,6 +26,10 @@ public class DocumentoService {
         return documentoRepository.findAll();
     }
 
+    public List <Documento> getDocumentoByAutor(Autor autor){return documentoRepository.findByAutor(autor);}
+
+    public List <Documento> getDocumentoByCarrera(Carrera carrera){return documentoRepository.findByCarrera(carrera);}
+
     // Obtener documento por ID
     public Optional<Documento> getDocumentoById(Long id) {
         return documentoRepository.findById(id);
@@ -36,8 +42,26 @@ public class DocumentoService {
         return documentoRepository.save(documento);
     }
 
+    public Documento updateDocumento(Long id, Documento documentoActualizado) {
+        Documento documentoExistente = documentoRepository.findById(id).orElse(null);
+        if (documentoExistente != null) {
+            documentoActualizado.setId_documento(id);
+            return documentoRepository.save(documentoActualizado);
+        } else {
+            return null;
+        }
+    }
+
     // Eliminar documento
     public void deleteDocumento(Long id) {
         documentoRepository.deleteById(id);
+    }
+
+    public List<Documento> getDocumentosByAnio(int anio) {
+        return documentoRepository.findByAnioPublicacion(anio);
+    }
+
+    public List<Documento> getDocumentosByNombre(String nombre) {
+        return documentoRepository.findByTitulo(nombre);
     }
 }
