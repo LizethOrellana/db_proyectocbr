@@ -106,7 +106,7 @@ public class DocumentoController {
             documento.setCarrera(carrera);
 
             documentoService.saveDocumento(documento);
-            return ResponseEntity.ok("Documento guardado correctamente");
+            return ResponseEntity.status(HttpStatus.OK).body("Documento guardado correctamente");
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al guardar documento: " + e.getMessage());
         }

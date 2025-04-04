@@ -42,7 +42,7 @@ public class AutorService {
 
     //Buscar autor
     public List<Autor> searchAutor(String nombre) {
-        return autorRepository.findByNombreContaining(nombre);
+        return autorRepository.findByNombre(nombre);
     }
 
 }

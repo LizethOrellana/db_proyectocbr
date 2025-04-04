@@ -44,6 +44,6 @@ public class AutorController {
 
     @GetMapping("/buscar")
     public List<Autor> buscarAutores(@RequestParam("nombre") String nombre) {
-        return autorRepository.findByNombreContaining(nombre);
+        return autorRepository.findByNombre(nombre);
     }
 }

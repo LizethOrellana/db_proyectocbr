@@ -38,7 +38,6 @@ public class DocumentoService {
     // Crear o actualizar documento
     @Transactional
     public Documento saveDocumento(Documento documento) {
-        logger.info("ID DOCUMENTO:"+documento.getId_documento());
         return documentoRepository.save(documento);
     }
 
