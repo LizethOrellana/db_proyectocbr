@@ -77,18 +77,24 @@ public class DocumentoController {
         }
     }
 
-
-    // Crear o actualizar documento
+    // Crear documento
     @PostMapping("/crear")
     public ResponseEntity<String> createDocumento(
             @RequestParam("file") MultipartFile file,
             @RequestParam("titulo") String titulo,
+            @RequestParam("documentoId") Long documentoId,
             @RequestParam("resumen") String resumen,
             @RequestParam("anioPublicacion") int anioPublicacion,
             @RequestParam("autorId") Long autorId,
             @RequestParam("carreraId") Long carreraId) {
         try {
             Documento documento = new Documento();
+            if (documentoId!=null) {
+                documento = documentoRepository.findById(documentoId).orElse(null);
+                if (documento == null) {
+                    return ResponseEntity.badRequest().body("Documento no encontrado");
+                }
+            }
             documento.setContenido(file.getBytes());
             documento.setTitulo(titulo);
             documento.setResumen(resumen);
