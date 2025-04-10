@@ -28,8 +28,8 @@ public class UsuarioService {
         logger.info("Nombre:"+usuario.getNombre());
         logger.info("Cedula:"+usuario.getCedula());
         logger.info("Rol:"+usuario.getRol());
-        logger.info("Primera Pregunta:"+usuario.getPrimera_pregunta());
-        logger.info("Segunda Pregunta:"+usuario.getPrimera_pregunta());
+        logger.info("Primera Pregunta:"+usuario.getMascota());
+        logger.info("Segunda Pregunta:"+usuario.getCiudad());
         //logger.info("201 Created: Usuario registrado correctamente");
 
         return usuarioRepository.save(usuario);
@@ -43,5 +43,10 @@ public class UsuarioService {
     @Transactional
     public void eliminarUsuario(String cedula) {
         usuarioRepository.deleteByCedula(cedula);
+    }
+
+    public Optional<Usuario> buscarUsuario(String cedula, String mascota, String ciudad) {
+        // Lógica para buscar al usuario utilizando el repositorio
+        return usuarioRepository.findByCedulaAndMascotaAndCiudad(cedula, mascota, ciudad);
     }
 }

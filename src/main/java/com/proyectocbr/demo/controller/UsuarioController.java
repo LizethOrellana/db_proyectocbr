@@ -79,8 +79,8 @@ public class UsuarioController {
             // Actualiza los campos necesarios
             usuarioExistente.setNombre(usuarioActualizado.getNombre());
             usuarioExistente.setRol(usuarioActualizado.getRol());
-            usuarioExistente.setPrimera_pregunta(usuarioActualizado.getPrimera_pregunta());
-            usuarioExistente.setSegunda_pregunta(usuarioActualizado.getSegunda_pregunta());
+            usuarioExistente.setMascota(usuarioActualizado.getMascota());
+            usuarioExistente.setCiudad(usuarioActualizado.getMascota());
 
             usuarioService.saveUsuario(usuarioExistente); // Guarda el usuario actualizado
             return ResponseEntity.ok("Usuario actualizado correctamente");
@@ -101,5 +101,27 @@ public class UsuarioController {
                     .body("Error al eliminar usuario: " + e.getMessage());
         }
     }
+
+
+    @PostMapping("/buscarusuario")
+    public ResponseEntity<?> buscarUsuario(@RequestParam String cedula, @RequestParam String mascota, @RequestParam String ciudad) {
+        try {
+            // Busca al usuario que cumpla con los criterios en la base de datos
+            Optional<Usuario> usuarioEncontrado = usuarioRepository.findByCedulaAndMascotaAndCiudad(cedula, mascota, ciudad);
+
+            if (usuarioEncontrado.isPresent()) {
+                // Si se encuentra, devuelve los datos del usuario
+                return ResponseEntity.ok(usuarioEncontrado.get());
+            } else {
+                // Si no se encuentra, devuelve un mensaje de error
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado con los datos proporcionados.");
+            }
+        } catch (Exception e) {
+            // Manejo de errores
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al buscar usuario: " + e.getMessage());
+        }
+    }
+
 }
 
