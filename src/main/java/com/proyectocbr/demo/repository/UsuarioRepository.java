@@ -11,8 +11,4 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
     Optional<Usuario> findByCedula(String cedula);
 
     void deleteByCedula(String cedula);
-
-    Optional<Usuario> findByCedulaAndMascotaAndCiudad(String cedula, String mascota, String ciudad);
-
-    String ciudad(String ciudad);
 }

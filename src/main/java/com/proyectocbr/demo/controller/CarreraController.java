@@ -39,6 +39,7 @@ public class CarreraController {
         carreraService.deleteCarrera(id);
     }
 
+    //Obtener documento por nombre
     @GetMapping("/buscar")
     public List<Carrera> buscarCarreras(@RequestParam("nombre") String nombre) {
         return carreraService.searchCarrera(nombre);

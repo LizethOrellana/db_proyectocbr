@@ -26,8 +26,10 @@ public class DocumentoService {
         return documentoRepository.findAll();
     }
 
+    //Obtener documento por autor
     public List <Documento> getDocumentoByAutor(Autor autor){return documentoRepository.findByAutor(autor);}
 
+    //Obtener documento por carrera
     public List <Documento> getDocumentoByCarrera(Carrera carrera){return documentoRepository.findByCarrera(carrera);}
 
     // Obtener documento por ID
@@ -41,6 +43,7 @@ public class DocumentoService {
         return documentoRepository.save(documento);
     }
 
+    //Actualizar documento
     public Documento updateDocumento(Long id, Documento documentoActualizado) {
         Documento documentoExistente = documentoRepository.findById(id).orElse(null);
         if (documentoExistente != null) {
@@ -56,10 +59,12 @@ public class DocumentoService {
         documentoRepository.deleteById(id);
     }
 
+    //Obtner documento por anio
     public List<Documento> getDocumentosByAnio(int anio) {
         return documentoRepository.findByAnioPublicacion(anio);
     }
 
+    //Obtener documento por nombre
     public List<Documento> getDocumentosByNombre(String nombre) {
         return documentoRepository.findByTitulo(nombre);
     }

@@ -55,18 +55,21 @@ public class DocumentoController {
         return documentoService.getDocumentoById(id);
     }
 
+    //Obtener el documento por el autor
     @PostMapping("/buscarAutor")
     public List<Documento> getDocumentoByAutor(@RequestBody Autor autor) {
         logger.info("Buscando documentos por autor");
         return documentoService.getDocumentoByAutor(autor);
     }
 
+    //Obtener el documento por carrera
     @PostMapping("/buscarCarrera")
     public List<Documento> getDocumentoByCarrera(@RequestBody Carrera carrera) {
         logger.info("Buscando documentos por carrera");
         return documentoService.getDocumentoByCarrera(carrera);
     }
 
+    //Actualizar documento
     @PutMapping("/{id}")
     public ResponseEntity<Documento> updateDocumento(@PathVariable Long id, @RequestBody Documento documentoActualizado) {
         Documento documento = documentoService.updateDocumento(id, documentoActualizado);
@@ -82,15 +85,16 @@ public class DocumentoController {
     public ResponseEntity<String> createDocumento(
             @RequestParam("file") MultipartFile file,
             @RequestParam("titulo") String titulo,
-            @RequestParam("documentoId") Long documentoId,
+            @RequestParam("documentoId") String documentoId,
             @RequestParam("resumen") String resumen,
             @RequestParam("anioPublicacion") int anioPublicacion,
             @RequestParam("autorId") Long autorId,
             @RequestParam("carreraId") Long carreraId) {
         try {
             Documento documento = new Documento();
-            if (documentoId!=null) {
-                documento = documentoRepository.findById(documentoId).orElse(null);
+            if (documentoId != null && documentoId.matches("\\d+")) {
+                Long docId= Long.parseLong(documentoId);
+                documento = documentoRepository.findById(docId).orElse(null);
                 if (documento == null) {
                     return ResponseEntity.badRequest().body("Documento no encontrado");
                 }
@@ -118,6 +122,7 @@ public class DocumentoController {
         }
     }
 
+    //Metodo para mostrar el documento
     @GetMapping("/verdocumento/{id}")
     public ResponseEntity<byte[]> getDocumento(@PathVariable Long id) {
         logger.info("Id enviado: " + id);
@@ -132,16 +137,17 @@ public class DocumentoController {
         }
     }
 
+    //Obtener el documento por año
     @GetMapping("/buscarPorAnio")
     public List<Documento> getDocumentosByAnio(@RequestParam int anio) {
         return documentoService.getDocumentosByAnio(anio);
     }
 
+    //Obtener el documento por nombre
     @GetMapping("/buscarPorNombre")
     public List<Documento> getDocumentosByNombre(@RequestParam String nombre) {
         return documentoService.getDocumentosByNombre(nombre);
     }
-
 
     // Eliminar documento
     @DeleteMapping("/{id}")

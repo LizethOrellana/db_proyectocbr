@@ -19,10 +19,12 @@ public class UsuarioService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    //Obtener todos los usuarios
     public List<Usuario> getAllUsuarios() {
         return usuarioRepository.findAll();
     }
 
+    //Guardar el usuario
     public Usuario saveUsuario(Usuario usuario) {
         logger.info("Usuario");
         logger.info("Nombre:"+usuario.getNombre());
@@ -35,18 +37,15 @@ public class UsuarioService {
         return usuarioRepository.save(usuario);
     }
 
+    //Obtener usuario por cedula
     public Usuario obtenerUsuarioPorCedula(String cedula) {
         Optional<Usuario> usuarioOptional = usuarioRepository.findByCedula(cedula);
         return usuarioOptional.orElse(null); // Devuelve el usuario si existe, o null si no existe
     }
 
+    //Eliminar por usuario
     @Transactional
     public void eliminarUsuario(String cedula) {
         usuarioRepository.deleteByCedula(cedula);
-    }
-
-    public Optional<Usuario> buscarUsuario(String cedula, String mascota, String ciudad) {
-        // Lógica para buscar al usuario utilizando el repositorio
-        return usuarioRepository.findByCedulaAndMascotaAndCiudad(cedula, mascota, ciudad);
     }
 }

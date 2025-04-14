@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -25,11 +26,13 @@ public class UsuarioController {
 
     private static final Logger logger = LoggerFactory.getLogger(UsuarioService.class);
 
+    //Obtener todos los usuarios
     @GetMapping
     public List<Usuario> getUsuarios() {
         return usuarioService.getAllUsuarios();
     }
 
+    // Crear usuario
     @PostMapping("/crearusuario")
     public ResponseEntity<?> crearUsuario(@RequestBody Usuario usuario) {
         try {
@@ -67,6 +70,7 @@ public class UsuarioController {
         }
     }
 
+    //Modificar el usuario
     @PutMapping("/editarusuario/{cedula}")
     public ResponseEntity<?> editarUsuario(@PathVariable String cedula, @RequestBody Usuario usuarioActualizado) {
         try {
@@ -79,8 +83,8 @@ public class UsuarioController {
             // Actualiza los campos necesarios
             usuarioExistente.setNombre(usuarioActualizado.getNombre());
             usuarioExistente.setRol(usuarioActualizado.getRol());
-            usuarioExistente.setMascota(usuarioActualizado.getMascota());
-            usuarioExistente.setCiudad(usuarioActualizado.getMascota());
+            usuarioExistente.setPrimera_pregunta(usuarioActualizado.getPrimera_pregunta());
+            usuarioExistente.setSegunda_pregunta(usuarioActualizado.getSegunda_pregunta());
 
             usuarioService.saveUsuario(usuarioExistente); // Guarda el usuario actualizado
             return ResponseEntity.ok("Usuario actualizado correctamente");
@@ -91,6 +95,7 @@ public class UsuarioController {
         }
     }
 
+    //Eliminar usuario
     @DeleteMapping("/eliminarusuario/{cedula}")
     public ResponseEntity<?> eliminarUsuario(@PathVariable String cedula) {
         try {
@@ -102,26 +107,61 @@ public class UsuarioController {
         }
     }
 
+    //buscar usuario por cedula
+    @GetMapping("/{cedula}")
+    public ResponseEntity<?> obtenerUsuarioPorCedula(@PathVariable String cedula) {
+        Usuario usuario = usuarioService.obtenerUsuarioPorCedula(cedula);
+        if (usuario == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
+        }
+        return ResponseEntity.ok(usuario);
+    }
 
-    @PostMapping("/buscarusuario")
-    public ResponseEntity<?> buscarUsuario(@RequestParam String cedula, @RequestParam String mascota, @RequestParam String ciudad) {
-        try {
-            // Busca al usuario que cumpla con los criterios en la base de datos
-            Optional<Usuario> usuarioEncontrado = usuarioRepository.findByCedulaAndMascotaAndCiudad(cedula, mascota, ciudad);
+    //Metodo para verificar las preguntas de seguridad
+    @PostMapping("/verificarPreguntas/{cedula}")
+    public ResponseEntity<?> verificarPreguntasSeguridad(
+            @PathVariable String cedula,
+            @RequestBody Map<String, String> respuestas) {
 
-            if (usuarioEncontrado.isPresent()) {
-                // Si se encuentra, devuelve los datos del usuario
-                return ResponseEntity.ok(usuarioEncontrado.get());
-            } else {
-                // Si no se encuentra, devuelve un mensaje de error
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado con los datos proporcionados.");
-            }
-        } catch (Exception e) {
-            // Manejo de errores
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error al buscar usuario: " + e.getMessage());
+        Usuario usuarioExistente = usuarioService.obtenerUsuarioPorCedula(cedula);
+        if (usuarioExistente == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
+        }
+
+        String primeraPregunta = respuestas.get("primeraPregunta"); //cambiado para que coincida con el json
+        String segundaPregunta = respuestas.get("segundaPregunta");//cambiado para que coincida con el json
+
+        if (primeraPregunta == null || segundaPregunta == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Faltan preguntas de seguridad");
+        }
+
+        if (usuarioExistente.getPrimera_pregunta().equalsIgnoreCase(primeraPregunta) &&
+                usuarioExistente.getSegunda_pregunta().equalsIgnoreCase(segundaPregunta)) {
+            return ResponseEntity.ok("Preguntas de seguridad correctas");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Respuestas de seguridad incorrectas");
         }
     }
 
-}
+    // Metodo para modificar la contraseña del usuario
+    @PutMapping("/cambiarContrasenia/{cedula}")
+    public ResponseEntity<?> cambiarContrasenia(@PathVariable String cedula, @RequestBody Map<String, String> nuevaContrasenia) {
+        try {
+            Usuario usuarioExistente = usuarioService.obtenerUsuarioPorCedula(cedula);
+            if (usuarioExistente == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
+            }
 
+            String contrasenia = nuevaContrasenia.get("nuevaContrasenia"); //manejo del json
+            if(contrasenia == null){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Falta la nueva contraseña");
+            }
+            usuarioExistente.setContrasenia(contrasenia); // ¡Asegúrate de hashear esto!
+            usuarioService.saveUsuario(usuarioExistente);
+            return ResponseEntity.ok("Contraseña actualizada correctamente");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al actualizar la contraseña: " + e.getMessage());
+        }
+    }
+}

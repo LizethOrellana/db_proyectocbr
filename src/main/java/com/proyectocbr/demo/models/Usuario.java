@@ -37,4 +37,10 @@ public class Usuario {
 
     @Column(nullable = false)
     private String ciudad;
+
+    @Column(nullable = false)
+    private String primera_pregunta;
+
+    @Column(nullable = false)
+    private String segunda_pregunta;
 }

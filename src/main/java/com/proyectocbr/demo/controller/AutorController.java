@@ -42,6 +42,7 @@ public class AutorController {
         return autorService.saveAutor(autor);
     }
 
+    //Obtener autor por nombre
     @GetMapping("/buscar")
     public List<Autor> buscarAutores(@RequestParam("nombre") String nombre) {
         return autorRepository.findByNombre(nombre);

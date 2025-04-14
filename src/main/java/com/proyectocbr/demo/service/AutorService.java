@@ -26,14 +26,13 @@ public class AutorService {
         return autorRepository.findById(id);
     }
 
-
+    //Guardar autor
     public Autor saveAutor(Autor autor) {
         if (autor.getId_autor() != null && autorRepository.existsById(autor.getId_autor())) {
             throw new RuntimeException("El autor con ID " + autor.getId_autor() + " ya existe.");
         }
         return autorRepository.save(autor);
     }
-
 
     // Eliminar autor
     public void deleteAutor(Long id) {
