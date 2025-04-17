@@ -13,11 +13,14 @@ import lombok.*;
 public class Documento {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id_documento;
+    private Long id_documento;
 
     private String titulo;
     private int anioPublicacion;
     private String resumen;
+
+    @Lob
+    private byte[] contenido;
 
     @ManyToOne
     @JoinColumn(name = "id_autor")

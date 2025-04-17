@@ -37,8 +37,14 @@ public class AutorController {
     }
 
     // Crear o actualizar autor
-    @PostMapping("/crearautor")
+    @PostMapping("/crear")
     public Autor createAutor(@RequestBody Autor autor) {
         return autorService.saveAutor(autor);
+    }
+
+    //Obtener autor por nombre
+    @GetMapping("/buscar")
+    public List<Autor> buscarAutores(@RequestParam("nombre") String nombre) {
+        return autorRepository.findByNombre(nombre);
     }
 }

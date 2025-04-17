@@ -28,8 +28,15 @@ public class Usuario {
     @Column(nullable = false)
     private String cedula;
 
+    //ROLES: ADMIN, CONTRIBUIDOR, PUBLICO
     @Column(nullable = false)
     private String rol;
+
+    @Column(nullable = false)
+    private String mascota;
+
+    @Column(nullable = false)
+    private String ciudad;
 
     @Column(nullable = false)
     private String primera_pregunta;

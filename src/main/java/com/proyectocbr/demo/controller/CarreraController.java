@@ -28,7 +28,7 @@ public class CarreraController {
     }
 
     // Crear o actualizar carrera
-    @PostMapping
+    @PostMapping("/crear")
     public Carrera createCarrera(@RequestBody Carrera carrera) {
         return carreraService.saveCarrera(carrera);
     }
@@ -37,5 +37,11 @@ public class CarreraController {
     @DeleteMapping("/{id}")
     public void deleteCarrera(@PathVariable Long id) {
         carreraService.deleteCarrera(id);
+    }
+
+    //Obtener documento por nombre
+    @GetMapping("/buscar")
+    public List<Carrera> buscarCarreras(@RequestParam("nombre") String nombre) {
+        return carreraService.searchCarrera(nombre);
     }
 }

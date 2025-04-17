@@ -1,6 +1,7 @@
 package com.proyectocbr.demo.service;
 
 import com.proyectocbr.demo.models.Autor;
+import com.proyectocbr.demo.models.Carrera;
 import com.proyectocbr.demo.repository.AutorRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,7 @@ public class AutorService {
         return autorRepository.findById(id);
     }
 
-
+    //Guardar autor
     public Autor saveAutor(Autor autor) {
         if (autor.getId_autor() != null && autorRepository.existsById(autor.getId_autor())) {
             throw new RuntimeException("El autor con ID " + autor.getId_autor() + " ya existe.");
@@ -33,9 +34,14 @@ public class AutorService {
         return autorRepository.save(autor);
     }
 
-
     // Eliminar autor
     public void deleteAutor(Long id) {
         autorRepository.deleteById(id);
     }
+
+    //Buscar autor
+    public List<Autor> searchAutor(String nombre) {
+        return autorRepository.findByNombre(nombre);
+    }
+
 }
