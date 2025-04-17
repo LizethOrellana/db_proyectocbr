@@ -19,8 +19,7 @@ public class Documento {
     private int anioPublicacion;
     private String resumen;
 
-    @Lob
-    private byte[] contenido;
+    private String contenido;
 
     @ManyToOne
     @JoinColumn(name = "id_autor")

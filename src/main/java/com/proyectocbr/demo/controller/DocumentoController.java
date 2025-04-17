@@ -9,18 +9,28 @@ import com.proyectocbr.demo.repository.DocumentoRepository;
 import com.proyectocbr.demo.service.AutorService;
 import com.proyectocbr.demo.service.CarreraService;
 import com.proyectocbr.demo.service.DocumentoService;
-import com.proyectocbr.demo.service.UsuarioService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/documentos")
@@ -41,6 +51,10 @@ public class DocumentoController {
     private AutorRepository autorRepository;
     @Autowired
     private CarreraRepository carreraRepository;
+
+    @Value("${file.upload.directory}")
+    private String uploadDirectory;
+
 
 
     // Obtener todos los documentos
@@ -85,28 +99,45 @@ public class DocumentoController {
     public ResponseEntity<String> createDocumento(
             @RequestParam("file") MultipartFile file,
             @RequestParam("titulo") String titulo,
-            @RequestParam("documentoId") String documentoId,
+            @RequestParam(value = "documentoId", required = false) String documentoId,
             @RequestParam("resumen") String resumen,
             @RequestParam("anioPublicacion") int anioPublicacion,
             @RequestParam("autorId") Long autorId,
             @RequestParam("carreraId") Long carreraId) {
         try {
+            logger.info("Creando Documento");
             Documento documento = new Documento();
             if (documentoId != null && documentoId.matches("\\d+")) {
-                Long docId= Long.parseLong(documentoId);
+                Long docId = Long.parseLong(documentoId);
                 documento = documentoRepository.findById(docId).orElse(null);
                 if (documento == null) {
                     return ResponseEntity.badRequest().body("Documento no encontrado");
                 }
             }
-            documento.setContenido(file.getBytes());
+            // Generar un nombre de archivo único
+            String originalFilename = file.getOriginalFilename();
+            logger.info("Originalname:"+originalFilename);
+            String fileExtension = "";
+            if (originalFilename != null && originalFilename.contains(".")) {
+                fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            }
+            String uniqueFilename = UUID.randomUUID().toString() + fileExtension;
+            Path filePath = Paths.get(uploadDirectory, uniqueFilename);
+            logger.info("Path:"+filePath);
+
+            // Guardar el archivo en la carpeta
+            file.transferTo(filePath);
+
+            // Guardar la ruta del archivo en la base de datos
+            documento.setContenido(filePath.toString());
+            logger.info("documento:"+documento.getContenido());
             documento.setTitulo(titulo);
             documento.setResumen(resumen);
             documento.setAnioPublicacion(anioPublicacion);
 
             // Obtener Autor y Carrera usando orElse()
-            Autor autor = autorRepository.findById((long) autorId).orElse(null); // Devuelve null si no se encuentra
-            Carrera carrera = carreraRepository.findById((long) carreraId).orElse(null); // Devuelve null si no se encuentra
+            Autor autor = autorRepository.findById(autorId).orElse(null);
+            Carrera carrera = carreraRepository.findById(carreraId).orElse(null);
 
             if (autor == null || carrera == null) {
                 return ResponseEntity.badRequest().body("Autor o Carrera no encontrados");
@@ -116,7 +147,7 @@ public class DocumentoController {
             documento.setCarrera(carrera);
 
             documentoService.saveDocumento(documento);
-            return ResponseEntity.status(HttpStatus.OK).body("Documento guardado correctamente");
+            return ResponseEntity.status(HttpStatus.OK).body("Documento guardado correctamente. Ruta: " + filePath);
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al guardar documento: " + e.getMessage());
         }
@@ -124,18 +155,32 @@ public class DocumentoController {
 
     //Metodo para mostrar el documento
     @GetMapping("/verdocumento/{id}")
-    public ResponseEntity<byte[]> getDocumento(@PathVariable Long id) {
-        logger.info("Id enviado: " + id);
+    public ResponseEntity<Resource> getDocumento(@PathVariable Long id) {
         Documento documento = documentoRepository.findById(id).orElse(null);
         if (documento != null && documento.getContenido() != null) {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_PDF); // Ajusta el Content-Type según el tipo de archivo
-            headers.setContentDisposition(ContentDisposition.inline().build()); // o .attachment().build() para descarga
-            return new ResponseEntity<>(documento.getContenido(), headers, HttpStatus.OK);
+            Path filePath = Paths.get(documento.getContenido());
+            Resource resource = new FileSystemResource(filePath);
+
+            if (resource.exists()) {
+                HttpHeaders headers = new HttpHeaders();
+                MediaType mediaType;
+                try {
+                    mediaType = MediaType.parseMediaType(Files.probeContentType(filePath));
+                } catch (IOException e) {
+                    mediaType = MediaType.APPLICATION_OCTET_STREAM;
+                }
+                headers.setContentType(mediaType);
+                headers.setContentDisposition(ContentDisposition.inline().filename(filePath.getFileName().toString()).build());
+
+                return new ResponseEntity<>(resource, headers, HttpStatus.OK);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
         } else {
             return ResponseEntity.notFound().build();
         }
     }
+
 
     //Obtener el documento por año
     @GetMapping("/buscarPorAnio")

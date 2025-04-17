@@ -30,8 +30,8 @@ public class UsuarioService {
         logger.info("Nombre:"+usuario.getNombre());
         logger.info("Cedula:"+usuario.getCedula());
         logger.info("Rol:"+usuario.getRol());
-        logger.info("Primera Pregunta:"+usuario.getMascota());
-        logger.info("Segunda Pregunta:"+usuario.getCiudad());
+        logger.info("Primera Pregunta:"+usuario.getPrimera_pregunta());
+        logger.info("Segunda Pregunta:"+usuario.getSegunda_pregunta());
         //logger.info("201 Created: Usuario registrado correctamente");
 
         return usuarioRepository.save(usuario);
