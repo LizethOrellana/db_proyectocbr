@@ -52,8 +52,8 @@ public class UsuarioController {
     @PostMapping("/iniciarsesion")
     public ResponseEntity<?> iniciarSesion(@RequestParam String cedula, @RequestParam String contrasenia) {
         try {
+            logger.info("Iniciando Sesión");
             Optional<Usuario> usuarioEncontrado = usuarioRepository.findByCedula(cedula);
-
             if (usuarioEncontrado.isPresent()) {
                 Usuario usuarioDB = usuarioEncontrado.get();
                 if (usuarioDB.getContrasenia().equals(contrasenia)) {

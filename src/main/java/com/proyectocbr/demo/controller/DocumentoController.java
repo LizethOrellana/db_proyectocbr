@@ -97,9 +97,10 @@ public class DocumentoController {
     // Crear documento
     @PostMapping("/crear")
     public ResponseEntity<String> createDocumento(
-            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "file", required = false)  MultipartFile file,
             @RequestParam("titulo") String titulo,
             @RequestParam(value = "documentoId", required = false) String documentoId,
+            @RequestParam(value = "contenido", required = false) String contenido,
             @RequestParam("resumen") String resumen,
             @RequestParam("anioPublicacion") int anioPublicacion,
             @RequestParam("autorId") Long autorId,
@@ -114,23 +115,24 @@ public class DocumentoController {
                     return ResponseEntity.badRequest().body("Documento no encontrado");
                 }
             }
-            // Generar un nombre de archivo único
-            String originalFilename = file.getOriginalFilename();
-            logger.info("Originalname:"+originalFilename);
-            String fileExtension = "";
-            if (originalFilename != null && originalFilename.contains(".")) {
-                fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            if(contenido == null) {
+                // Generar un nombre de archivo único
+                String originalFilename = file.getOriginalFilename();
+                String fileExtension = "";
+                if (originalFilename != null && originalFilename.contains(".")) {
+                    fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
+                }
+                String uniqueFilename = UUID.randomUUID().toString() + fileExtension;
+                Path filePath = Paths.get(uploadDirectory, uniqueFilename);
+
+                // Guardar el archivo en la carpeta
+                file.transferTo(filePath);
+
+                // Guardar la ruta del archivo en la base de datos
+                documento.setContenido(filePath.toString());
+            }else{
+                documento.setContenido(contenido);
             }
-            String uniqueFilename = UUID.randomUUID().toString() + fileExtension;
-            Path filePath = Paths.get(uploadDirectory, uniqueFilename);
-            logger.info("Path:"+filePath);
-
-            // Guardar el archivo en la carpeta
-            file.transferTo(filePath);
-
-            // Guardar la ruta del archivo en la base de datos
-            documento.setContenido(filePath.toString());
-            logger.info("documento:"+documento.getContenido());
             documento.setTitulo(titulo);
             documento.setResumen(resumen);
             documento.setAnioPublicacion(anioPublicacion);
@@ -145,9 +147,13 @@ public class DocumentoController {
 
             documento.setAutor(autor);
             documento.setCarrera(carrera);
-
+            logger.info("documento resumen: "+documento.getResumen());
+            logger.info("documento carrera: "+documento.getCarrera());
+            logger.info("documento autor: "+documento.getAutor());
+            logger.info("documento titulo: "+documento.getTitulo());
+            logger.info("documento anio: "+documento.getAnioPublicacion());
             documentoService.saveDocumento(documento);
-            return ResponseEntity.status(HttpStatus.OK).body("Documento guardado correctamente. Ruta: " + filePath);
+            return ResponseEntity.status(HttpStatus.OK).body("Documento guardado correctamente.");
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al guardar documento: " + e.getMessage());
         }
