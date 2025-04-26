@@ -85,6 +85,7 @@ public class UsuarioController {
             usuarioExistente.setRol(usuarioActualizado.getRol());
             usuarioExistente.setPrimera_pregunta(usuarioActualizado.getPrimera_pregunta());
             usuarioExistente.setSegunda_pregunta(usuarioActualizado.getSegunda_pregunta());
+            usuarioExistente.setContrasenia(usuarioActualizado.getContrasenia());
 
             usuarioService.saveUsuario(usuarioExistente); // Guarda el usuario actualizado
             return ResponseEntity.ok("Usuario actualizado correctamente");
