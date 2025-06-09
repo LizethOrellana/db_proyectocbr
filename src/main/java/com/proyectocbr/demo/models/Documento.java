@@ -17,7 +17,10 @@ public class Documento {
 
     private String titulo;
     private int anioPublicacion;
+    @Lob
+    @Column(name = "resumen", columnDefinition = "TEXT")
     private String resumen;
+
 
     private String contenido;
 
