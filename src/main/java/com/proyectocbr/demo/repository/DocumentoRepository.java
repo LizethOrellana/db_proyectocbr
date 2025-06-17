@@ -10,6 +10,7 @@ import java.util.List;
 
 @Repository
 public interface DocumentoRepository extends JpaRepository<Documento, Long> {
+    List<Documento> findByNombreContainingIgnoreCase(String nombre);
     List<Documento> findByAutor(Autor autor);
     List<Documento> findByCarrera(Carrera carrera);
     List<Documento> findByAnioPublicacion(int anioPublicacion);
