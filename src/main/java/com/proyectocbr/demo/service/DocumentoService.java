@@ -66,6 +66,6 @@ public class DocumentoService {
 
     //Obtener documento por nombre
     public List<Documento> getDocumentosByNombre(String nombre) {
-        return documentoRepository.findByNombreContainingIgnoreCase(nombre);
+        return documentoRepository.findByTituloContainingIgnoreCase(nombre);
     }
 }
