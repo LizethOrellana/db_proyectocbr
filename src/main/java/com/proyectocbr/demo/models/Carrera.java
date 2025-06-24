@@ -13,7 +13,8 @@ import lombok.*;
 public class Carrera {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id_carrera;
+    @Column(name = "id_carrera", columnDefinition = "BIGINT UNSIGNED")
+    private Long id_carrera;
 
     private String nombre;
 }
